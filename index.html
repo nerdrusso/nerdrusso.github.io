@@ -1,34 +1,964 @@
 <html>
- <head>
-    <title>database</title>
- </head>
- <body style="background-color:black;">
 
-<div id="img_home"></div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+
+<audio id="audioPlayer" src="https://invidious.namazso.eu/latest_version?id=GAXed1UqyaM&itag=251&local=true" oncanplaythrough="setTimeSliderMax()" ontimeupdate="updateTimeSlider()" onended="advanceAudio()"></audio>
+
+<div class="toolbar">
+  <div class="toolbar-left" style="display: flex; align-items: center;"><div style="width: 22px; height: 22px; border-radius: 35px; text-align: center; background-color: #fff; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.7); margin-right: 3px">
+  <i class="fa fa-play" style="font-size: 12px; color: darkred"></i></div>Music</div>
+  <div class="toolbar-right">
+    <a href="#play"><i class="fa fa-book"></i></a>
+    <a href="#pause"><i class="fa fa-search"></i></a>
+    <a href="#volume"f"><i class="fa fa-circle"></i></a>
+  </div>
+</div>
+
+
+<div class="bottom-nav" id="navb">
+  <a style="color: #fff" href="#home">    
+      <i class="fa fa-home">
+          <div>Home</div>
+       </i></a>
+  <a style="color: #858585" href="#search"><i class="fa fa-compass">
+      <div>Explore</div>
+      
+  </i></a>
+  <a style="color: #858585" href="#settings"><i class="fa fa-folder"><div>Library</div>
+      
+  </i></a>
+</div>
+<div id="swipe" class="song-info">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkvR1bZeVZYa7I-uz7YeqPzKK3InKeqUrECg&usqp=CAU" alt="Song Cover" class="song-cover" id="mint">
+  <div class="song-text">
+    <div class="song-title" id="tit">Pretty Girl</div>
+    <div class="song-artist" id="namee">Clairo</div>
+  </div>
+   
+   <img src="https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/play-icon-256.png" alt="image" style="vertical-align: middle; height: 20px; width: 20px; margin-right: 25px; " id="kkkj" onclick="togglePlayPause()">
+   <img src="https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/end-icon-18-256.png" alt="image" style="vertical-align: middle; height: 20px; width: 20px; margin-right: 5px; " id="minfo2">
+   
+  
+  </div>
+</div>
+
+<div id="fullscreen-overlay" style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; background-color: #401810">
+  
+    <i class="fa fa-chevron-down" style="color: #c9c9c9; font-size: 20px; margin: 20px;">
+ 
+    <div class="container">
+  <img id="imgk" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkvR1bZeVZYa7I-uz7YeqPzKK3InKeqUrECg&usqp=CAU" alt="">
+  <h1>Pretty Girl</h1>
+  <div id="nam">Clairo</div>
+  
+  <input id="papa" type="range" value="70" min="0" max="100" oninput="setCurrentTime()"/> 
+  <label for="slider"></label>
+  <div id="timeIndicator">
+<label id="cul">0:00</label>
+<label id="length">0:00</label>
+<div id="circle"></div>
+</div>
+  
+  <div style="display: flex; width: 88%; justify-content: space-between; align-items: center; margin-top: 10px;">
+      <img src="https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/shuffle-icon-18-256.png" style="width: 20px; height: 20px;"></img>
+
+<img src="https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/skip-to-start-icon-18-256.png" style="width: 35px; height: 30px;"></img>
+
+<!-- Previous Track Button -->
+<div style="width: 70px; height: 70px; border-radius: 35px; text-align: center; background-color: #fff; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.1); transition: background-color 1s;" onclick="togglePlayPause()" id="playPauseButton">
+  <img src="https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/pause-icon-18-256.png" alt="image" style="vertical-align: middle; height: 37px; width: 35px; " id="pp">
+</div>
+
+<!-- Next Track Button -->
+<img src="https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/end-icon-18-256.png" style="width: 35px; height: 30px;"></img>
+<img src="https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/repeat-icon-18-256.png" style="width: 22px; height: 22px;"></img>
+
+</div>
+<div class="bottom-nav2" id="nav2" >
+  <div style="color: #fff">UP NEXT</div>
+  <div style="color: #fff;" >LYRICS</div>
+  <div style="color: #fff;" >RELATED</div>
+</div>
+
+
+
+
+<style>
+    #audioPlayer {
+    display: none;
+  }
+    
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding-top: 40px;
+}
+
+#imgk {
+  margin-top: 7px;
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+  width: 88%;
+  height: 300px;
+  border-radius: 4px;
+  object-fit: cover;
+  
+}
+  
+
+h1 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  display: block;
+  text-align: center;
+  color: white;
+  font-size: 27px;
+  white-space: nowrap;
+}
+ 
+
+#nam {
+  font-size: 17px;
+  opacity: 0.7;
+  color: #fff;
+}
+#circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: white;
+  position: absolute;
+  transform: translateY(-19.5px);
+  
+}
+#papa {
+  width: 88%;
+  background: black;
+  margin-top: 25px;
+  height: 3px;
+   -webkit-appearance: none;
+  background: #777;
+  outline: none;
+  border-radius: 10px;
+  overflow: hidden;
+}
+#papa::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 1px;
+  height: 3px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #666;
+  box-shadow: -403px 0 0 400px white;
+}
+#rangevalue {
+    width: 85%;
+    color: #ccc;
+    margin-top: 8px;
+    font-size: 13px;
+  
+}
+
+#timeIndicator {
+  display: flex;
+  width: 86.5%;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+
+#currentTime {
+  margin-right: auto;
+}
+
+
+#length {
+  margin-left: auto;
+}
+</style>
+
+    
+    </div>
+<div id="fullscreen-overlay2" style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; background-color: #603830">
+   <ul id="custom-list">
+  <!-- The list items will be added here dynamically -->
+</ul>
+  </ul>
+    
+</div>
+<template id="item-template">
+  <div class="item">
+   
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkvR1bZeVZYa7I-uz7YeqPzKK3InKeqUrECg&usqp=CAU" alt="Song Cover" class="song-cover2">
+  <div class="song-text2" style="width: 60%; color: white; margin-left: 15px; font-size: 17px">
+    <div class="song-title2">Song Title</div>
+    <div class="song-artist2" style="color: #ccc">Artist Name</div>
+  </div>
+
+  </div>
+</template>
+
+</html>
+<style>
+    
+   html {
+       background-color: black;
+       margin: 0px;
+       padding: 0px;
+       
+   }
+   
+    .bottom-nav {
+  text-align: center;
+  font-size: 25px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #1D1D1D;
+  padding: 6px;
+  position: fixed; 
+  bottom: 0; 
+  left: 0; 
+  right: 0;
+  z-index: 2;
+  transition: transform 0.35s ease-out;
+transform: translateY(0%);
+}
+
+.bottom-nav2 {
+  text-align: center;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 6px;
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  right: 0;
+  height: 40px;
+  z-index: 1;
+  transition: background-color 1s;
+}
+ 
+ .bottom-nav3 {
+  text-align: center;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  right: 0;
+  height: 40px;
+  z-index: 1;
+  display: none;
+}
+
+.bottom-nav a {
+  color: #ccc;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+.bottom-nav a:hover {
+  color: white;
+}
+.bottom-nav div {
+  padding-top: 2px;
+  text-align: center;
+  font-size: 12px;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toolbar {
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #101010;
+  border-bottom: 1px solid #404040;
+  padding: 10px;
+  padding-right: 0px;
+}
+
+.toolbar-left {
+  color: white;
+  font-size: 27px;
+  margin-left: 10px;
+}
+
+.toolbar-right a:hover {
+  color: grey;
+}
+.toolbar-right a { 
+  color: white;
+  font-size: 24px; 
+  margin-right: 20px;
+   }
+
+
+
+.song-info {
+  position: fixed; 
+  bottom: 0; 
+  left: 0; 
+  right: 0;
+  display: flex; 
+  align-items: center;
+  padding: 9px;
+  padding-bottom: 62px;
+  background-color: #401810; 
+  transition: background-color 1s;
+}
+.item {
+  left: 0; 
+  right: 0;
+  display: flex; 
+  align-items: center;
+  padding: 9px;
+  
+}
+.song-text, .song-text2{
+  width: 57%;
+  color: white;
+  margin-left: 15px;
+  }
+.song-artist, song-artist2 {
+    color: #ccc;
+}
+
+.song-cover, .song-cover2 {
+  width: 47px;
+  height: 47px;
+  border-radius: 3px;
+  margin-left: 5px;
+  object-fit: cover;
+}
+.song-icons {
+  font-size: 20px;
+  color: white;
+  justify-content: end;
+}
+
+#kk {
+    padding-right: 20px;
+}
+#fullscreen-overlay { 
+transition: transform 0.35s, background-color 1s;
+transform: translateY(100%);
+}
+#fullscreen-overlay2 { 
+transition: transform 0.35s, background-color 1s;
+overflow: scroll;
+transform: translateY(100%);
+}
+</style>
 
 <script>
-let d = "";
-let w = screen.width;
-w = w / 2;
-let ranks = [];
-function remove(string, from, to) {
-    return string.slice(0, from) + string.slice(to);
-}
-const http = new XMLHttpRequest()
-http.open("GET", "https://docs.google.com/spreadsheets/d/1878ketoUIKHLooXdFrWRWLaxPe-TDhcrjJZVfxokOR8/export?format=tsv")
-http.send()
-http.onload = () => {
-let text = http.responseText;
-ranks = text.split("\n");
-ranks.shift();
-ranks.forEach(function (e) {
-    var img = new Image();
-    d = e;
-    d = remove(d, 0, 19);
-    img.src = d;
-    img.width = w;
-    img_home.appendChild(img);
+    var percent;
+    var min;
+    var max;
+    const circle = document.getElementById("circle");
+
+    
+   var label = document.getElementById('cul');
+  var ll = document.getElementById('length');
+    
+    
+    
+    function updd(curr){
+  imgk.src = 'https://i3.ytimg.com/vi/' + listData[curr].url.replace("/watch?v=", "") + '/maxresdefault.jpg';;
+  mint.src = 'https://i3.ytimg.com/vi/' + listData[curr].url.replace("/watch?v=", "") + '/maxresdefault.jpg';
+  h1E.textContent = listData[curr].title;
+  tit.textContent = listData[curr].title;
+  namee.textContent = listData[curr].uploaderName.replace("- Topic", "");
+  nam.textContent = listData[curr].uploaderName.replace("- Topic", "");
+ imgk.onload = get_average_rgb;
+audioPlayer.src = 'https://invidious.namazso.eu/latest_version?id=' + listData[curr].url.replace("/watch?v=", "") + '&itag=251&local=true';
+audioPlayer.currentTime = 0; timeSlider.value = 0;
+  setTimeSliderMax(); 
+try{
+audioPlayer.play();
+      pp.src = "https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/pause-icon-18-256.png";
+      kkj.src = "https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/pause-icon-18-256.png";
+  nextIndex = curr + 1;
+  
+  } catch(error)
+  {
+      //kk
+  }
+  
+  }
+    
+    var nextIndex
+  var audioPlayer = document.getElementById("audioPlayer");
+  var kkj = document.getElementById("kkkj");
+  var pp = document.getElementById("pp");
+  
+  var playPauseButton = document.getElementById("playPauseButton");
+  var timeSlider = document.getElementById("papa");
+  
+  function setTimeSliderMax() { timeSlider.max = audioPlayer.duration; 
+  min = timeSlider.min;
+  max = timeSlider.max;
+  ll.textContent = formatTime(Math.round(timeSlider.max));
+  if (ll.textContent === "NaN:NaN") { 
+  ll.textContent = "0:00";}
+  
+  }
+  
+  function togglePlayPause() {
+    if (audioPlayer.paused) {
+      audioPlayer.play();
+      pp.src = "https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/pause-icon-18-256.png";
+      kkj.src = "https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/pause-icon-18-256.png";
+    } else {
+      audioPlayer.pause();
+      pp.src = "https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/play-icon-256.png";
+      kkj.src = "https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/play-icon-256.png";
+    }
+  }
+  
+  
+  function setCurrentTime() {
+    audioPlayer.currentTime = timeSlider.value;     
+    label.textContent = formatTime(Math.round(audioPlayer.currentTime));
+    const valuey = timeSlider.value;
+  
+
+  percent = (valuey - min) / (max - min);
+  const left = percent * (timeSlider.offsetWidth - circle.offsetWidth);
+  
+  circle.style.left = `${left + 36}px`;
+    if (audioPlayer.ended) { 
+    advanceAudio();
+    
+    }
+  }
+  
+  function advanceAudio() {    
+  try {
+  updd(nextIndex);
+    }catch{
+      updd(0);  
+      
+    }
+  }
+  
+  
+  function updateTimeSlider() {
+    timeSlider.value = audioPlayer.currentTime;
+    label.textContent = formatTime(Math.round(audioPlayer.currentTime));
+    const valuey = timeSlider.value;
+  
+
+  percent = (valuey - min) / (max - min);
+  const left = percent * (timeSlider.offsetWidth - circle.offsetWidth);
+  
+  circle.style.left = `${left + 36}px`;
+  }
+  
+  
+  function get_average_rgb(img) {
+var img = document.getElementById("imgk");
+
+// Create a canvas element
+var canvas = document.createElement("canvas");
+
+// Set the canvas width and height to 1 pixel
+canvas.width = 1;
+canvas.height = 1;
+
+// Get the canvas context
+var ctx = canvas.getContext("2d");
+
+var quadrants = [
+  { x: 0, y: 0 },
+  { x: img.width / 3, y: 0 },
+  { x: 2 * img.width / 3, y: 0 },
+  { x: 0, y: img.height / 3 },
+  { x: img.width / 3, y: img.height / 3 },
+  { x: 2 * img.width / 3, y: img.height / 3 },
+  { x: 0, y: 2 * img.height / 3 },
+  { x: img.width / 3, y: 2 * img.height / 3 },
+  { x: 2 * img.width / 3, y: 2 * img.height / 3 }
+];
+
+
+// Array to store the most saturated pixels from each quadrant
+var mostSaturatedPixels = [];
+
+quadrants.forEach(quadrant => {
+  // Draw the image on the canvas, using the quadrant coordinates
+  ctx.drawImage(img, quadrant.x, quadrant.y, 1, 1, 0, 0, 1, 1);
+
+  // Get the pixel data from the canvas
+  
+canvas.willReadFrequently = true;
+  var pixelData = ctx.getImageData(0, 0, 1, 1).data;
+
+  // Calculate the saturation of the pixel
+  var saturation = (Math.max(pixelData[0], pixelData[1], pixelData[2]) - Math.min(pixelData[0], pixelData[1], pixelData[2])) / 255;
+
+  // Add the pixel to the array if it is the most saturated so far
+  if (mostSaturatedPixels.length === 0 || saturation > mostSaturatedPixels[0].saturation) {
+    mostSaturatedPixels = [{      x: quadrant.x,      y: quadrant.y,      saturation: saturation,      hex: "#" + ("000000" + ((pixelData[0] << 16) | (pixelData[1] << 8) | pixelData[2]).toString(16)).slice(-6)
+    }];
+  } else if (saturation === mostSaturatedPixels[0].saturation) {
+    mostSaturatedPixels.push({
+      x: quadrant.x,
+      y: quadrant.y,
+      saturation: saturation,
+      hex: "#" + ("000000" + ((pixelData[0] << 16) | (pixelData[1] << 8) | pixelData[2]).toString(16)).slice(-6)
+    });
+  }
 });
-};
+
+// Log the most saturated pixels
+// Log the hex value of the most saturated pixels
+
+var hexString = mostSaturatedPixels[0].hex;
+
+
+// Convert hex to RGB
+var r= parseInt(hexString.slice(1, 3), 16);
+var g = parseInt(hexString.slice(3, 5), 16);
+var b = parseInt(hexString.slice(5, 7), 16);
+
+
+ 
+  function setVToHalf(rgb, lala, tutu) {
+  // Convert RGB to HSV
+  let hsv = RGBtoHSV(rgb);
+
+ hsv[2] = lala;
+ hsv[1] = tutu;
+  
+  
+  // Convert HSV back to RGB
+  let newRgb = HSVtoRGB(hsv);
+
+  return newRgb;
+}
+
+function RGBtoHSV(rgb) {
+  let r = rgb[0] / 255;
+  let g = rgb[1] / 255;
+  let b = rgb[2] / 255;
+
+  let cmax = Math.max(r, g, b);
+  let cmin = Math.min(r, g, b);
+  let delta = cmax - cmin;
+
+  let h = 0;
+  let s = 0;
+  let v = cmax;
+
+  if (delta != 0) {
+    s = delta / cmax;
+
+    if (r == cmax) {
+      h = (g - b) / delta;
+    } else if (g == cmax) {
+      h = 2 + (b - r) / delta;
+    } else {
+      h = 4 + (r - g) / delta;
+    }
+
+    h = h * 60;
+    if (h < 0) {
+      h += 360;
+    }
+  }
+
+  return [h, s, v];
+}
+
+function HSVtoRGB(hsv) {
+  let h = hsv[0];
+  let s = hsv[1];
+  let v = hsv[2];
+
+  let c = v * s;
+  let x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  let m = v - c;
+
+  let r = 0;
+  let g = 0;
+  let b = 0;
+
+  if (0 <= h && h < 60) {
+    r = c;
+    g = x;
+    b = 0;
+  } else if (60 <= h && h < 120) {
+    r = x;
+    g = c;
+    b = 0;
+  } else if (120 <= h && h < 180) {
+    r = 0;
+    g = c;
+    b = x;
+  } else if (180 <= h && h < 240) {
+    r = 0;
+    g = x;
+    b = c;
+  } else if (240 <= h && h < 300) {
+    r = x;
+    g = 0;
+    b = c;
+  } else if (300 <= h && h < 360) {
+    r = c;
+    g = 0;
+    b = x;
+  }
+
+  r = Math.round((r + m) * 255);
+  g = Math.round((g + m) * 255);
+  b = Math.round((b + m) * 255);
+
+  return [r, g, b];
+}
+
+let rgb = [r, g, b];
+let newRgb = setVToHalf(rgb, 0.25, 0.9);
+let newRgb2 = setVToHalf(rgb, 0.4, 0.8);
+ r = newRgb[0];
+ g = newRgb[1];
+ b = newRgb[2];
+
+
+  
+
+// Convert RGB to hex
+const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+
+// Set hexString to the new hex color value
+hexString = hex;
+
+ r = newRgb2[0];
+ g = newRgb2[1];
+ b = newRgb2[2];
+
+
+const hex2 = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+
+// Set hexString to the new hex color value
+var hexString2;
+hexString2 = hex2;
+
+
+fullscreen.style.backgroundColor = hexString;
+fullscreen2.style.backgroundColor = hexString2;
+nav2.style.backgroundColor = hexString2;
+
+playPauseButton.style.backgroundColor = hexString2;
+swipe.style.backgroundColor = hexString;
+   }
+
+  
+  function enableSwipeDetection(element, callback, xx) {
+  // Initialize variables to track the starting position of the swipe
+  let startX;
+  let startY;
+
+  // Add event listeners to the element to detect swipes
+  element.addEventListener('touchstart', handleTouchStart);
+  element.addEventListener('touchmove', handleTouchMove);
+  element.addEventListener('touchend', handleTouchEnd);
+
+  // The touchstart event is fired when the user begins a touch
+  function handleTouchStart(event) {
+    // Get the starting position of the touch
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+  }
+
+  // The touchmove event is fired when the user moves their finger on the screen
+  function handleTouchMove(event) {
+    
+  }
+
+  // The touchend event is fired when the user lifts their finger off the screen
+  function handleTouchEnd(event) {
+    // Get the ending position of the touch
+    const endX = event.changedTouches[0].clientX;
+    const endY = event.changedTouches[0].clientY;
+
+    
+    const diffX = endX - startX;
+    const diffY = endY - startY;
+
+    
+    
+    if (Math.abs(diffX) > 150 || Math.abs(diffY) > 50) {
+       if(xx = 1){
+      if(startY < endY){
+      
+      
+     
+      
+      const computedStyle = getComputedStyle(fullscreen2);
+const transform = computedStyle.transform;
+
+if (transform === 'matrix(1, 0, 0, 1, 0, 0)') {
+ fullscreen2.style.transform = 'translateY(100%)';
+ if(fullscreen2.scrollTop != 0){
+  fullscreen2.style.transform = 'translateY(0)';
+  }else{
+      
+  }
+} else {
+
+
+      
+      
+      
+      fullscreen.style.transform = 'translateY(100%)';
+      navb.style.transform = 'translateY(0)';
+      //AKSBJDKSJSH
+      
+      }
+      
+      
+       }else{
+     fullscreen.style.transform = 'translateY(0%)';
+     navb.style.transform = 'translateY(100%)';
+     }}
+     
+    }
+  }
+}
+const nav2 = document.getElementById('nav2');
+const fullscreen2 = document.getElementById('fullscreen-overlay2');
+enableSwipeDetection(fullscreen2, exit2, 9);
+
+
+const navb = document.getElementById('navb');
+
+var imgk = document.getElementById('imgk');
+
+
+imgk.crossOrigin = "anonymous";
+
+
+const mint = document.getElementById('mint');
+
+const tit = document.getElementById('tit');
+
+const namee = document.getElementById('namee');
+const nam = document.getElementById('nam');
+
+
+enableSwipeDetection(nav2, kk, 150);
+
+
+const fullscreen = document.getElementById('fullscreen-overlay');
+enableSwipeDetection(fullscreen, exit, 1);
+
+const h1E = document.querySelector('h1');
+
+const swipe = document.getElementById('swipe');
+enableSwipeDetection(swipe, enter, 150);
+swipe.addEventListener('click', function() { enter();});
+
+
+function enter() { 
+ fullscreen.style.transform = 'translateY(0)';
+ navb.style.transform = 'translateY(100%)';
+ fullscreen2.style.transform = 'translateY(100%)';
+ 
+ }
+ function exit() { 
+ 
+ 
+ //KAKAKALLA
+ 
+ }
+ nav2.addEventListener('click', function() { kk();});
+ function kk() { 
+  
+computedStyle = getComputedStyle(fullscreen2);
+transform = computedStyle.transform;
+
+if (transform === 'matrix(1, 0, 0, 1, 0, 0)') {
+ fullscreen2.style.transform = 'translateY(100%)';
+ 
+} else {
+  fullscreen2.style.transform = 'translateY(0)';
+  
+}
+
+ 
+ }
+function exit2() { 
+ 
+ }
+// ...and so on
+
+
+  let listData;
+ 
+  
+  const url = `https://pipedapi.kavin.rocks/playlists/PLLW9wzzsM4O8TPavugKAv6jvdvkBOKvgQ`;
+
+  const http = new XMLHttpRequest();
+ 
+  http.open("GET", url)
+  http.send(null)
+  http.onload = () => {
+  let text = http.responseText;
+  let maap = text.substring(parseInt(text.indexOf("relatedStreams\":") + 16), parseInt(text.lastIndexOf("}") - 0));
+  listData = JSON.parse(maap);
+;
+    updd2(0);
+  
+const aspectRatio = imgk.naturalWidth / imgk.naturalHeight; 
+const width = imgk.offsetWidth; imgk.style.height = `${width*1.1}px`;
+
+  // Get the list element
+  const listElement = document.getElementById('custom-list');
+  
+  listElement.innerHTML = '';
+
+listData.map(item => {
+    // Create the list item element
+    const listItemElement = document.createElement('li');
+
+    // Create the image element
+    const imageElement = document.createElement('img');
+    imageElement.src = 'https://i3.ytimg.com/vi/' + item.url.replace("/watch?v=", "") + '/mqdefault.jpg';
+    imageElement.alt = item.title;
+
+    // Create the content container element
+    const contentElement = document.createElement('div');
+    contentElement.classList.add('content');
+
+    // Create the title element
+    const titleElement = document.createElement('h3');
+    titleElement.textContent = item.title;
+
+    // Create the description element
+    const descriptionElement = document.createElement('p');
+    descriptionElement.textContent = item.uploaderName.replace("- Topic", "");
+
+    // Append the title and description to the content container
+    contentElement.appendChild(titleElement);
+    contentElement.appendChild(descriptionElement);
+
+    // Append the image and content container to the list item
+    listItemElement.appendChild(imageElement);
+    listItemElement.appendChild(contentElement);
+listItemElement.addEventListener("click", function() {
+  
+  fullscreen2.style.transform = 'translateY(100%)';
+  var cure = listData.indexOf(item);
+  
+  updd(cure);
+  
+  nextIndex = (cure + 1) % listData.length;
+  
+});
+    // Append the list item to the list
+    listElement.appendChild(listItemElement);
+  });
+  
+  };
+      
+
+
+function updd2(curr){
+  imgk.src = 'https://i3.ytimg.com/vi/' + listData[curr].url.replace("/watch?v=", "") + '/maxresdefault.jpg';
+  mint.src = 'https://i3.ytimg.com/vi/' + listData[curr].url.replace("/watch?v=", "") + '/maxresdefault.jpg';
+  h1E.textContent = listData[curr].title;
+  tit.textContent = listData[curr].title;
+  namee.textContent = listData[curr].uploaderName.replace("- Topic", "");
+  nam.textContent = listData[curr].uploaderName.replace("- Topic", "");
+ imgk.onload = get_average_rgb;
+audioPlayer.src = 'https://invidious.namazso.eu/latest_version?id=' + listData[curr].url.replace("/watch?v=", "") + '&itag=251&local=true';
+audioPlayer.currentTime = 0; timeSlider.value = 0;
+  setTimeSliderMax(); 
+      pp.src = "https://iconsplace.com/wp-content/uploads/_icons/ffffff/256/png/play-icon-256.png";
+      
+      
+  nextIndex = curr + 1;
+  
+  
+  }
+
+function formatTime(timeInSeconds) {
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = timeInSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  
+}
+
+
+
 </script>
-</body>
+
+<style>
+    /* Style the list */
+#custom-list {
+  padding: 10px; /* Add padding to the left and right sides of the list */
+
+}
+
+    
+  /* Style the list item */
+  #custom-list li {
+    display: flex; /* Use flex layout for the list item */
+    align-items: center; 
+    align-itens: flex-start;
+    margin: 0px;
+    margin-bottom: 18px;
+    
+  }
+
+  /* Style the content container */
+  #custom-list .content {
+    display: block; /* Use block layout for the content container */
+  }
+
+  /* Style the image */
+  #custom-list img {
+    width: 47px;
+    height: 47px;
+    margin-right: 16px;
+    margin-left: 8px;
+    border-radius: 3px;
+    object-fit: cover;
+    overflow: scroll;
+  }
+/* Style the title */
+#custom-list h3 {
+  font-size: 14px;
+  color: #fff;
+  margin: 0;
+  padding: 0; 
+  padding-bottom: 4px;
+}
+
+/* Style the description */
+#custom-list p {
+  font-size: 14px;
+  margin: 0;
+  padding: 0; 
+}
+
+    
+</style>
