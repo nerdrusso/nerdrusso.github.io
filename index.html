@@ -143,5 +143,8 @@ let search = id('search')
 search.addEventListener('click', function() {
   show(true);
 });
+let url = window.location.href;
+let q = url.searchParams.get('q');
+sbar.value = q;
 
 </script>
