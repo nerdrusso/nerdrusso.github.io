@@ -1,9 +1,3 @@
-// Define routes and corresponding functions using page.js
-page('/user/:userId', function(ctx) {
-    const userId = ctx.params.userId;
-    findUser(userId);
-});
-
 // Function to find user and display feedback
 function findUser(userId) {
     // Your logic to find the user based on the userId
@@ -22,6 +16,15 @@ function getUserDetails(userId) {
     return users[userId] || { username: 'Guest' }; // Default to Guest if user not found
 }
 
-// Start the page.js routing
-page();
+// Extract userId from the URL and trigger findUser function
+const path = window.location.pathname;
+const userRegex = /\/user\/(\w+)/;
+const match = path.match(userRegex);
+
+if (match) {
+    const userId = match[1];
+    findUser(userId);
+} else {
+    // Handle other routes or show a 404 page
+}
 
