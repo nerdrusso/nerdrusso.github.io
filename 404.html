@@ -6,8 +6,11 @@
     <script>
         // Extract the user part from the current URL
         const userPart = window.location.pathname.split('/')[1]; // Assuming the user part is the first segment of the path
-        // Redirect to index.html with the user part included
-        window.location.replace(`index.html/${userPart}`);
+        // Check if the current URL already contains index.html
+        if (!window.location.pathname.includes('index.html') && userPart) {
+            // Redirect to index.html with the user part included
+            window.location.replace(`index.html/${userPart}`);
+        }
     </script>
 </head>
 <body>
