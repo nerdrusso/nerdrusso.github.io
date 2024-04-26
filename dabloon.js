@@ -1,65 +1,29 @@
-//it just logs, lol
-function log(txt) { 
-    console.log(txt)
-    }
-
-
-//gets element by id
-function id(name){ 
-return document.getElementById(name);
-}
-function div(id, parent) {
-id = document.createElement('div');
-  element.id = id;
-
-  parent.appendChild(id);
+// Function to find user and display feedback
+function findUser(userId) {
+    // Your logic to find the user based on the userId
+    const user = getUserDetails(userId); // Assuming you have a function to get user details
+    const feedbackElement = document.getElementById('feedback');
+    feedbackElement.textContent = `Welcome, ${user.username}!`; // Display username in the feedback
 }
 
-
-//creates a buttom
-function btn(id, parent) {
-var elem = document.createElement('button');
-  elem.id = id;
-
-  parent.appendChild(elem);
+// Mock function to get user details
+function getUserDetails(userId) {
+    // Mock user data for demonstration
+    const users = {
+        user123: { username: 'Alice' },
+        user456: { username: 'Bob' }
+    };
+    return users[userId] || { username: 'Guest' }; // Default to Guest if user not found
 }
 
+// Extract userId from the URL and trigger findUser function
+const path = window.location.pathname;
+const userRegex = /\/user\/(\w+)/;
+const match = path.match(userRegex);
 
-//creates a div
-function div(id, parent) {
-var elem = document.createElement('div');
-  elem.id = id;
-
-  parent.appendChild(elem);
-}
- 
-//rounds the corners
-  HTMLElement.prototype.radiius = function(radi) {
-  this.style.borderRadius = vh(radi);
-}
-
-//converts px to vh
-function vh(num)
-{
-    return num*0.14+"vh";
-}
-
-
-//sets the width
-HTMLElement.prototype.x = 
-function(xx) {
-  this.style.width = vh(xx);
-}
-
-
-//sets the height
-HTMLElement.prototype.y = 
-function(yy) {
-  this.style.height = vh(yy);
-}
-
-
-//sets click listener
-function onClick(element, func) {
-  element.addEventListener('click', func);
+if (match) {
+    const userId = match[1];
+    findUser(userId);
+} else {
+    // Handle other routes or show a 404 page
 }
