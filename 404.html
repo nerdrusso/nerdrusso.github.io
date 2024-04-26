@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0;url=index.html">
     <title>Redirecting...</title>
+    <script>
+        // Extract the user part from the current URL
+        const userPart = window.location.pathname.split('/')[1]; // Assuming the user part is the first segment of the path
+        // Redirect to index.html with the user part included
+        window.location.replace(`index.html/${userPart}`);
+    </script>
 </head>
 <body>
     <p>If you are not redirected automatically, follow this <a href="index.html">link</a>.</p>
