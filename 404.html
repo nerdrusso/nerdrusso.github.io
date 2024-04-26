@@ -8,12 +8,13 @@
         const userPart = window.location.pathname.split('/')[1]; // Assuming the user part is the first segment of the path
         // Check if the current URL already contains index.html
         if (!window.location.pathname.includes('index.html') && userPart) {
-            // Redirect to index.html with the user part included
-            window.location.replace(`index.html/${userPart}`);
+            // Redirect to the root domain with the user part included
+            window.location.replace(window.location.origin + '/' + userPart);
         }
     </script>
 </head>
 <body>
-    <p>If you are not redirected automatically, follow this <a href="index.html">link</a>.</p>
+    <p>If you are not redirected automatically, follow this <a href="/">link</a>.</p>
 </body>
 </html>
+
