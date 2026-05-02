@@ -1,16 +1,513 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Feedback</title>
+    <title>Code Playground</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --bar-color: #2d2d2d;
+            --border-color: #333;
+            --accent-color: #007acc;
+            --text-color: #d4d4d4;
+            --resizer-size: 6px;
+            --top-bar-height: 40px;
+        }
+
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0;
+            height: 100%; width: 100%;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Top Bar */
+        #top-bar {
+            height: var(--top-bar-height);
+            background: var(--bar-color);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 1px solid var(--border-color);
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+        .status { font-size: 12px; color: #888; margin-left: 20px; font-weight: normal; }
+
+        /* Layout Grid */
+        #main-container {
+            display: grid;
+            height: calc(100% - var(--top-bar-height));
+            width: 100%;
+            /* Three columns: Left-Panels, Resizer, Right-Panels */
+            grid-template-columns: 1fr var(--resizer-size) 1fr;
+            /* Three rows: Top-Panels, Resizer, Bottom-Panels */
+            grid-template-rows: 1fr var(--resizer-size) 1fr;
+            background: var(--border-color);
+        }
+
+        .panel { 
+            position: relative; 
+            background: var(--bg-color); 
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Panel Assignments */
+        #panel-html { grid-column: 1; grid-row: 1; }
+        #panel-css  { grid-column: 3; grid-row: 1; }
+        #panel-js   { grid-column: 1; grid-row: 3; }
+        #panel-live { grid-column: 3; grid-row: 3; }
+
+        .panel textarea {
+            flex: 1;
+            width: 100%;
+            background: var(--bg-color);
+            color: #ccc;
+            border: none;
+            outline: none;
+            padding: 15px  0 0 15px;
+            resize: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .panel-label {
+            position: absolute; top: 10px; left: 15px;
+            font-size: 11px; color: #666; pointer-events: none;
+            text-transform: uppercase; font-weight: bold; letter-spacing: 1px;
+            display: none;
+        }
+
+        .copy-btn {
+            position: absolute; bottom: 10px; right: 10px;
+            background: #333; border: 1px solid #444;
+            color: #aaa; padding: 4px 10px;
+            font-size: 10px; cursor: pointer; border-radius: 4px;
+            transition: 0.2s; z-index: 5;
+        }
+        .copy-btn:hover { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+
+        iframe {
+            width: 100%; height: 100%;
+            background: white; border: none;
+        }
+
+        /* Resizers */
+        .resizer { 
+            background: var(--bar-color); 
+            transition: background 0.2s;
+            position: relative;
+            z-index: 10;
+        }
+        .resizer:hover, .resizer.dragging { background: var(--accent-color); }
+        
+        .resizer-v { 
+            grid-column: 2; grid-row: 1 / span 3; 
+            cursor: col-resize; 
+        }
+        .resizer-h { 
+            grid-column: 1 / span 3; grid-row: 2; 
+            cursor: row-resize; 
+        }
+
+        /* Sidebar */
+        #sidebar {
+            position: fixed; left: 0; top: 0; bottom: 0;
+            width: 280px; background: var(--bar-color);
+            transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000; border-right: 1px solid var(--border-color);
+            display: flex; flex-direction: column;
+            box-shadow: 10px 0 30px rgba(0,0,0,0);
+        }
+        #sidebar.open { 
+          transform: translateX(0);
+          box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+         }
+        
+        #overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            display: none; z-index: 999;
+        }
+        #overlay.show { display: block; }
+
+        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
+        .btn-new {
+            width: 100%; padding: 10px; background: var(--accent-color);
+            border: none; color: white; border-radius: 6px; cursor: pointer;
+            font-weight: bold;
+        }
+
+        .project-list { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .project-item {
+            padding: 12px 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: 0.2s;
+        }
+        .project-item:hover { background: #3a3a3a; }
+        .project-item.active { border-left: 4px solid var(--accent-color); background: #333; }
+        
+        .project-item input {
+            background: #111; border: 1px solid var(--accent-color);
+            color: white; font-size: 14px; width: 100%; padding: 4px; border-radius: 3px;
+        }
+
+        /* Context Menu */
+        #context-menu {
+            position: fixed; background: #2d2d2d; border: 1px solid #444;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none;
+            z-index: 2000; border-radius: 6px; min-width: 150px; padding: 5px;
+        }
+        .menu-item {
+            padding: 10px 15px; cursor: pointer; font-size: 13px; border-radius: 4px;
+        }
+        .menu-item:hover { background: var(--accent-color); color: white; }
+
+        /* Fullscreen View */
+        body.fullscreen #top-bar, 
+        body.fullscreen #main-container > .panel:not(#panel-live),
+        body.fullscreen .resizer { display: none !important; }
+        body.fullscreen #main-container { display: block; height: 100vh; }
+        body.fullscreen #panel-live { height: 100%; width: 100%; }
+    </style>
 </head>
 <body>
-    <h1>User.Feedback</h1>
-    <div id="feedback"></div>
 
-    <script src="https://unpkg.com/page/page.js"></script>
-    <script src="your-script.js"></script>
+<div id="overlay"></div>
+
+<div id="sidebar">
+    <div class="sidebar-header">
+        <h3 style="margin: 0 0 15px 0">My Projects</h3>
+        <button class="btn-new" onclick="createNewProject()">+ Create New</button>
+    </div>
+    <div class="project-list" id="project-list"></div>
+</div>
+
+<div id="top-bar">
+    <div class="brand" onclick="toggleSidebar()">
+        <span style="font-size: 20px;">☰</span>
+        <strong id="current-title" style="margin-left: 10px;">Loading...</strong>
+        <span class="status" id="save-status">Saved</span>
+    </div>
+    <div style="font-size: 12px; color: #555;">v1.0 Vanilla Playground</div>
+</div>
+
+<div id="main-container">
+    <!-- Panels -->
+    <div class="panel" id="panel-html">
+        <div class="panel-label">HTML</div>
+        <textarea id="html-editor" placeholder="Enter HTML..."></textarea>
+        <button class="copy-btn" onclick="copyEditor('html-editor')">Copy</button>
+    </div>
+
+    <div class="panel" id="panel-css">
+        <div class="panel-label">CSS</div>
+        <textarea id="css-editor" placeholder="Enter CSS..."></textarea>
+        <button class="copy-btn" onclick="copyEditor('css-editor')">Copy</button>
+    </div>
+
+    <div class="panel" id="panel-js">
+        <div class="panel-label">JavaScript</div>
+        <textarea id="js-editor" placeholder="Enter JavaScript..."></textarea>
+        <button class="copy-btn" onclick="copyEditor('js-editor')">Copy</button>
+    </div>
+
+    <div class="panel" id="panel-live">
+        <div class="panel-label" style="color: #999"></div>
+        <iframe id="preview"></iframe>
+    </div>
+
+    <!-- Resizers -->
+    <div class="resizer resizer-v" id="resizer-v"></div>
+    <div class="resizer resizer-h" id="resizer-h"></div>
+</div>
+
+<div id="context-menu">
+    <div class="menu-item" id="ctx-rename">Rename Project</div>
+    <div class="menu-item" id="ctx-preview">Open Full Preview</div>
+    <div class="menu-item" style="color: #ff5555; border-top: 1px solid #444; margin-top: 5px;" id="ctx-delete">Delete Project</div>
+</div>
+
+<script>
+    // --- State ---
+    let projects = JSON.parse(localStorage.getItem('playground_v2_projects') || '[]');
+    let currentProject = null;
+    let saveTimeout = null;
+    let renderTimeout = null;
+
+    const dom = {
+        html: document.getElementById('html-editor'),
+        css: document.getElementById('css-editor'),
+        js: document.getElementById('js-editor'),
+        preview: document.getElementById('preview'),
+        status: document.getElementById('save-status'),
+        projectList: document.getElementById('project-list'),
+        sidebar: document.getElementById('sidebar'),
+        overlay: document.getElementById('overlay'),
+        main: document.getElementById('main-container'),
+        ctxMenu: document.getElementById('context-menu'),
+        title: document.getElementById('current-title')
+    };
+
+    // --- Init ---
+    function init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const pid = urlParams.get('id');
+        const isFull = urlParams.get('full') === 'yes';
+
+        if (isFull) document.body.classList.add('fullscreen');
+
+        if (pid) {
+            const p = projects.find(x => x.id === pid);
+            p ? loadProject(p.id) : loadDefault();
+        } else {
+            loadDefault();
+        }
+
+        setupResizers();
+        setupEventListeners();
+        renderSidebar();
+    }
+
+    function loadDefault() {
+        if (projects.length > 0) {
+            loadProject(projects[0].id);
+        } else {
+            createNewProject();
+        }
+    }
+
+    function createNewProject() {
+        const id = 'Project' + Math.random().toString(36).substring(2, 7).toUpperCase();
+        const newProj = { id, html: '<h1>Hello World</h1>', css: 'body { background: #f0f0f0; font-family: sans-serif; text-align: center; padding-top: 5px; }', js: 'console.log("Hello from JS!");' };
+        projects.push(newProj);
+        saveToStorage();
+        loadProject(id);
+        renderSidebar();
+        toggleSidebar(false);
+    }
+
+    function loadProject(id) {
+        currentProject = projects.find(p => p.id === id);
+        if (!currentProject) return;
+
+        dom.html.value = currentProject.html;
+        dom.css.value = currentProject.css;
+        dom.js.value = currentProject.js;
+        
+        dom.title.innerText = currentProject.id;
+        document.title = currentProject.id + " | Playground";
+
+        updateURL(currentProject.id);
+        updatePreview();
+        renderSidebar();
+    }
+
+    function updatePreview() {
+        const source = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <style>${dom.css.value}</style>
+                </head>
+                <body>
+                    ${dom.html.value}
+                    <script>${dom.js.value}<\/script>
+                </body>
+            </html>
+        `;
+        dom.preview.srcdoc = source;
+    }
+
+    function saveToStorage() {
+        localStorage.setItem('playground_v2_projects', JSON.stringify(projects));
+        dom.status.innerText = 'Saved ✓';
+    }
+
+    function updateURL(id) {
+        const isFull = new URLSearchParams(window.location.search).get('full') === 'yes';
+        const url = `?id=${id}${isFull ? '&full=yes' : ''}`;
+        window.history.replaceState({}, '', url);
+    }
+
+    // --- Event Listeners ---
+    function setupEventListeners() {
+        [dom.html, dom.css, dom.js].forEach(el => {
+            el.addEventListener('input', () => {
+                dom.status.innerText = 'Saving...';
+                
+                currentProject.html = dom.html.value;
+                currentProject.css = dom.css.value;
+                currentProject.js = dom.js.value;
+
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(saveToStorage, 1000);
+
+                clearTimeout(renderTimeout);
+                renderTimeout = setTimeout(updatePreview, 400);
+            });
+        });
+
+        dom.overlay.onclick = () => toggleSidebar(false);
+        window.onclick = () => dom.ctxMenu.style.display = 'none';
+    }
+
+    function toggleSidebar(force) {
+        const isOpen = force !== undefined ? force : !dom.sidebar.classList.contains('open');
+        dom.sidebar.classList.toggle('open', isOpen);
+        dom.overlay.classList.toggle('show', isOpen);
+    }
+
+    function copyEditor(id) {
+        const text = document.getElementById(id).value;
+        navigator.clipboard.writeText(text);
+        const btn = event.target;
+        btn.innerText = 'Copied!';
+        setTimeout(() => btn.innerText = 'Copy', 1000);
+    }
+
+    // --- Sidebar & UI ---
+    function renderSidebar() {
+        dom.projectList.innerHTML = '';
+        projects.forEach(p => {
+            const div = document.createElement('div');
+            div.className = `project-item ${currentProject?.id === p.id ? 'active' : ''}`;
+            div.innerHTML = `<span class="p-name">${p.id}</span>`;
+            
+            div.onclick = (e) => {
+                if(e.target.tagName !== 'INPUT') loadProject(p.id);
+            };
+
+            div.oncontextmenu = (e) => {
+                e.preventDefault();
+                showContextMenu(e, p.id);
+            };
+
+            dom.projectList.appendChild(div);
+        });
+    }
+
+    function showContextMenu(e, id) {
+        dom.ctxMenu.style.display = 'block';
+        dom.ctxMenu.style.left = e.pageX + 'px';
+        dom.ctxMenu.style.top = e.pageY + 'px';
+
+        document.getElementById('ctx-rename').onclick = () => initiateRename(id);
+        document.getElementById('ctx-delete').onclick = () => deleteProject(id);
+        document.getElementById('ctx-preview').onclick = () => {
+            window.open(`?id=${id}&full=yes`, '_blank');
+        };
+    }
+
+    function initiateRename(id) {
+        const items = document.querySelectorAll('.project-item');
+        const item = Array.from(items).find(el => el.innerText.trim() === id);
+        if (!item) return;
+
+        const span = item.querySelector('.p-name');
+        const input = document.createElement('input');
+        input.value = id;
+        span.replaceWith(input);
+        input.focus();
+        input.select();
+
+        const finish = () => {
+            let newId = input.value.replace(/[^a-z0-9]/gi, '').substring(0, 32);
+            if (newId && newId !== id && !projects.find(x => x.id === newId)) {
+                const proj = projects.find(x => x.id === id);
+                proj.id = newId;
+                if (currentProject.id === id) {
+                    currentProject = proj;
+                    dom.title.innerText = newId;
+                    updateURL(newId);
+                }
+                saveToStorage();
+            }
+            renderSidebar();
+        };
+
+        input.onblur = finish;
+        input.onkeydown = (e) => { if(e.key === 'Enter') finish(); };
+    }
+
+    function deleteProject(id) {
+        if (!confirm(`Delete project "${id}"?`)) return;
+        projects = projects.filter(p => p.id !== id);
+        saveToStorage();
+        if (currentProject && currentProject.id === id) {
+            loadDefault();
+        } else {
+            renderSidebar();
+        }
+    }
+
+    // --- Grid Resizer Implementation ---
+    function setupResizers() {
+        const vResizer = document.getElementById('resizer-v');
+        const hResizer = document.getElementById('resizer-h');
+
+        vResizer.onmousedown = (e) => {
+            e.preventDefault();
+            document.body.style.cursor = 'col-resize';
+            vResizer.classList.add('dragging');
+            dom.preview.style.pointerEvents = 'none';
+
+            const onMouseMove = (moveEvent) => {
+                let percent = (moveEvent.clientX / window.innerWidth) * 100;
+                percent = Math.min(Math.max(percent, 15), 85); // Clamp
+                dom.main.style.gridTemplateColumns = `${percent}% var(--resizer-size) 1fr`;
+            };
+
+            const onMouseUp = () => {
+                document.body.style.cursor = 'default';
+                vResizer.classList.remove('dragging');
+                dom.preview.style.pointerEvents = 'auto';
+                window.removeEventListener('mousemove', onMouseMove);
+                window.removeEventListener('mouseup', onMouseUp);
+            };
+
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+        };
+
+        hResizer.onmousedown = (e) => {
+            e.preventDefault();
+            document.body.style.cursor = 'row-resize';
+            hResizer.classList.add('dragging');
+            dom.preview.style.pointerEvents = 'none';
+
+            const onMouseMove = (moveEvent) => {
+                let availableHeight = window.innerHeight - 40;
+                let percent = ((moveEvent.clientY - 40) / availableHeight) * 100;
+                percent = Math.min(Math.max(percent, 15), 85); // Clamp
+                dom.main.style.gridTemplateRows = `${percent}% var(--resizer-size) 1fr`;
+            };
+
+            const onMouseUp = () => {
+                document.body.style.cursor = 'default';
+                hResizer.classList.remove('dragging');
+                dom.preview.style.pointerEvents = 'auto';
+                window.removeEventListener('mousemove', onMouseMove);
+                window.removeEventListener('mouseup', onMouseUp);
+            };
+
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+        };
+    }
+
+    init();
+
+</script>
 </body>
 </html>
